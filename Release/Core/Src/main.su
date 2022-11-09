@@ -1,0 +1,6 @@
+../Core/Src/main.c:153:6:SystemClock_Config	96	static,ignoring_inline_asm
+../Core/Src/main.c:199:6:Blink_LED	8	static
+../Core/Src/main.c:206:6:Send_Code	32	static
+../Core/Src/main.c:81:5:main	16	static
+../Core/Src/main.c:234:6:WS2812B_Refresh	8	static
+../Core/Src/main.c:252:6:Error_Handler	0	static,ignoring_inline_asm
