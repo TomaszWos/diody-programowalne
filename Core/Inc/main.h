@@ -37,7 +37,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 typedef struct RGB_color {
-  uint8_t red, green, blue;
+  uint8_t zero,red, green, blue;
 } RGB_color;
 
 /* USER CODE END ET */

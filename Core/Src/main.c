@@ -32,6 +32,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -59,7 +60,7 @@
 uint8_t buff[72];
 uint8_t reset_buffer[48];
 RGB_color single_color;
-uint8_t switch_mode=0;
+uint8_t switch_mode=1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -112,9 +113,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  single_color.blue=0;
+  single_color.blue=2;
   single_color.green=0;
-  single_color.red=255;
+  single_color.red=5;
 
   HAL_SPI_Init(&hspi2);
 
@@ -129,43 +130,39 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  //Set_LED_Queue(single_color,1);
+	 // Set_One_Color(single_color);
+	 // Set_LED_Queue(single_color,1);
 
-	  switch(switch_mode){
-	  case 0:
-		  Reset_LED_color();
+	  if(switch_mode==0){
 		  Set_One_Color(single_color);
-		  break;
-
-	  case 1:
+	  }
+	  else if(switch_mode==1){
 		  Set_LED_Queue(single_color,1);
-		  break;
 
-	  case 2:
-		  Reset_LED_color();
-		  break;
-
-	  case 3:
-		  single_color.red=single_color.red+10;
-		  Reset_LED_color();
-		  Set_One_Color(single_color);
-		  break;
-
-	  case 4:
-		  single_color.green=single_color.green+10;
-		  Reset_LED_color();
-		  Set_One_Color(single_color);
-		  break;
-
-	  case 5:
-	 	  single_color.blue=single_color.blue+10;
-	 	 Reset_LED_color();
-	 	  Set_One_Color(single_color);
-	 	 break;
 	  }
 
-	  //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+	  else if(switch_mode==2){
+		  Reset_LED_color();
+	  }
+	  else if(switch_mode==3){
+		  single_color.red=single_color.red+10;
+		  Load_Color_Into_Buffer(single_color,&buff[0]);
+		  Set_One_Color(single_color);
+	  }
+	  else if(switch_mode==4){
+		  single_color.green=single_color.green+10;
+		  Load_Color_Into_Buffer(single_color,&buff[0]);
+		  Set_One_Color(single_color);
+	  }
+	  else if(switch_mode==5){
+	 	  single_color.blue=single_color.blue+10;
+	 	   Load_Color_Into_Buffer(single_color,&buff[0]);
+	 	   Set_One_Color(single_color);
+	  }
+
+
 	  	HAL_Delay(500);
+
   }
 
   /* USER CODE END 3 */
@@ -238,12 +235,11 @@ void Send_Reset()
 }
 void Set_One_Color(RGB_color color)
 {
-	Load_Color_Into_Buffer(color,&buff[0]);
+
 	for(int i=0;i<MAX_LED_NUMBER;i++)
 		  	{
-			  HAL_SPI_Transmit(&hspi2, &buff[0], 28, 1000);
+			  HAL_SPI_Transmit(&hspi2, &buff[0], 36, 1000);
 		  	}
-
 			Send_Reset();
 		  //HAL_SPI_Transmit(&hspi2, &reset_buffer[0], 48, 1000);
 
@@ -271,6 +267,7 @@ void Reset_LED_color()
 	c.red=0;
 	c.green=0;
 	c.blue=0;
+
 	Load_Color_Into_Buffer(c,&reset_buffer[0]);
 	for(int i=0;i<MAX_LED_NUMBER;i++)
 			  	{
@@ -279,15 +276,15 @@ void Reset_LED_color()
 	Send_Reset();
 
 }
-void Load_Color_Into_Buffer(RGB_color set_color, uint8_t *buffer)
+void Load_Color_Into_Buffer(RGB_color setcolor, uint8_t *buffer)
 {
 		uint8_t color_t;
 		uint8_t color[3];
 		uint8_t k=0;
-		//char msg[64];
-		color[0]=set_color.green;
-		color[1]=set_color.red;
-		color[2]=set_color.blue;
+
+		color[0]=setcolor.green;
+		color[1]=setcolor.red;
+		color[2]=setcolor.blue;
 		for(uint8_t i = 0; i < 3; i++){
 			color_t=color[i];
 			for(uint8_t j = 0; j < 8; j++)
@@ -308,7 +305,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin==GPIO_PIN_13){
 		switch_mode++;
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+		//HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 		if(switch_mode>5){switch_mode=0;}
 
 
